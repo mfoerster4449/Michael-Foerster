@@ -1,22 +1,23 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       VEX                                                       */
-/*    Created:      Thu Sep 26 2019                                           */
-/*    Description:  Competition Template                                      */
+/*    Author:       C:\Users\deanf                                            */
+/*    Created:      Sun Nov 24 2019                                           */
+/*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// frontLeftMotor       motor         1               
-// frontRightMotor      motor         2               
-// backLeftMotor        motor         3               
-// backRightMotor       motor         4               
-// leftIntake           motor         5               
-// rightIntake          motor         6               
+// Controller1          controller
+// frontLeftMotor       motor         1
+// frontRightMotor      motor         2
+// backLeftMotor        motor         3
+// backRightMotor       motor         4
+// leftIntake           motor         5
+// rightIntake          motor         6
+// pushMotor            motor         7
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -57,11 +58,25 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-frontLeftMotor.spin(directionType::fwd, 100, velocityUnits::pct);
-backLeftMotor.spin(directionType::fwd, 100, velocityUnits::pct);
-frontRightMotor.spin(directionType::rev, 100, velocityUnits::pct);
-backRightMotor.spin(directionType::rev, 100, velocityUnits::pct);
+  leftIntake.spin(reverse, 100, velocityUnits::pct);
+  rightIntake.spin(forward, 100, velocityUnits::pct);
+  wait(7, sec);
+  backRightMotor.spin(forward,50,velocityUnits::pct);
+  frontLeftMotor.spin(reverse,50,velocityUnits::pct);
+  backLeftMotor.spin(reverse,50, velocityUnits::pct);
+  frontRightMotor.spin(forward,50, velocityUnits::pct);
+  wait(1, sec);
+  backRightMotor.stop();
+  frontRightMotor.stop();
+  backLeftMotor.stop();
+  frontLeftMotor.stop();
 }
+  
+
+ 
+
+
+
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -74,74 +89,12 @@ backRightMotor.spin(directionType::rev, 100, velocityUnits::pct);
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-   while(true) {
-    
-    int32_t leftStick = Controller1.Axis3.value();
-    if(leftStick > 0) {
-      frontLeftMotor.spin(forward, 100, velocityUnits::pct);
-      backLeftMotor.spin(forward, 100, velocityUnits::pct );
-    }
-    else if(leftStick < 0) {
-      frontLeftMotor.spin(reverse, 100, velocityUnits::pct);
-      backLeftMotor.spin(reverse, 100, velocityUnits::pct);
-    }
-    else {
-      frontLeftMotor.stop();
-      backLeftMotor.stop();
-    }
+  while (true) {
 
-
-
-    int32_t rightStick = Controller1.Axis2.value();
-    if(rightStick > 0) {
-      frontRightMotor.spin(reverse, 100, velocityUnits::pct);
-      backRightMotor.spin(reverse, 100, velocityUnits::pct);
-    }
-    else if(rightStick < 0) {
-      frontRightMotor.spin(forward, 100, velocityUnits::pct);
-      backRightMotor.spin(forward, 100, velocityUnits::pct);
-    }
-    else {
-      frontRightMotor.stop();
-      backRightMotor.stop();
-    }
-
-
-
-
-
-    bool leftShoulder = Controller1.ButtonL1.pressing();
-    bool leftTrigger = Controller1.ButtonL2.pressing();
-
-    if(leftTrigger){
-      leftIntake.spin(reverse, 100, velocityUnits::pct);
-      rightIntake.spin(forward, 100, velocityUnits::pct);
-    }
-    else if(leftShoulder) { 
-     leftIntake.spin(forward, 100, velocityUnits::pct);
-     rightIntake.spin(reverse, 100, velocityUnits::pct);
-    }
-    else{
-     leftIntake.stop();
-     rightIntake.stop();
-
-
-    bool rightShoulder = Controller1.ButtonR1.pressing();
-    bool rightTrigger = Controller1.ButtonR2.pressing();
-
-    if(rightTrigger){
-      pushMotor.spin(reverse, 100, velocityUnits::pct);
-
-    }
-    else if(rightShoulder) { 
-      pushMotor.spin(forward, 100, velocityUnits::pct);
-    }
-    else{
-     pushMotor.stop();
-    }
-
-    }
-  
+    leftTrack(Controller1.Axis3);
+    rightTrack(Controller1.Axis2);
+    intake(Controller1.ButtonL1, Controller1.ButtonL2);
+    tower(Controller1.ButtonR1, Controller1.ButtonR2);
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
@@ -152,6 +105,7 @@ void usercontrol(void) {
 // Main will set up the competition functions and callbacks.
 //
 int main() {
+
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
